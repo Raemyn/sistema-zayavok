@@ -14,7 +14,6 @@ services:
     ports:
       - "8000:8000"
     environment:
-      # Эти переменные будут использованы Laravel'ом из .env (на всякий случай продублированы)
       DB_HOST: db
       DB_PORT: 3306
       DB_DATABASE: sistema_zayavok
@@ -27,10 +26,7 @@ services:
       sh -c "
         if [ ! -f .env ]; then cp .env.example .env || true; fi &&
         composer install --no-interaction --prefer-dist &&
-        php -r \"is_dir('storage') || mkdir('storage', 0777, true);\" &&
-        php -r \"is_dir('bootstrap/cache') || mkdir('bootstrap/cache', 0777, true);\" &&
         php artisan key:generate --force &&
-        php artisan storage:link || true &&
         php artisan migrate --force &&
         php artisan serve --host=0.0.0.0 --port=8000
       "
@@ -44,7 +40,28 @@ services:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_USER: laravel
       MYSQL_PASSWORD: laravel
-    # ⚠️ Если у тебя уже запущен локальный MySQL на 3306 — поменяй слева на 3307
     ports:
       - "3306:3306"
     volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot"]
+      interval: 5s
+      retries: 10
+      start_period: 30s
+
+  phpmyadmin:
+    image: phpmyadmin:5
+    container_name: sistema-phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: root
+    ports:
+      - "8080:80"
+
+volumes:
+  db_data:
+  composer_cache:
