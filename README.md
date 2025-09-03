@@ -8,6 +8,7 @@
 git clone https://github.com/Raemyn/sistema-zayavok
 cd sistema-zayavok
 docker-compose up -d
+docker exec -it sistema-app bash -c "composer install"
 docker exec -it sistema-app php artisan migrate --seed
 # Проект будет доступен на http://localhost:8000
 ```
