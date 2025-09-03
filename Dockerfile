@@ -9,17 +9,13 @@ RUN apt-get update && apt-get install -y \
 # Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Рабочая директория
 WORKDIR /var/www
 
-# Копируем только файлы зависимостей сначала (оптимизация сборки)
-COPY composer.json composer.lock ./
-
-# Устанавливаем зависимости на этапе билда
-RUN composer install --no-interaction --prefer-dist --optimize-autoloader
-
-# Копируем весь код приложения
+# Копируем весь код сразу (чтобы artisan был доступен)
 COPY . .
 
-# Открываем порт для Laravel
+# Устанавливаем зависимости
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader
+
+# Открываем порт
 EXPOSE 8000
