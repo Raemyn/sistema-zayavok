@@ -112,7 +112,7 @@ Invoke-RestMethod -Uri http://localhost:8000/api/leads `
 }
 ```
 
-3. Создать комментарий к заявке:
+3. Создать комментарий к заявке (админ):
 
 ```bash
 curl -X POST http://localhost:8000/api/leads/1/comments \
