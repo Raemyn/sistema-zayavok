@@ -24,9 +24,9 @@ docker exec -it sistema-app php artisan migrate --seed
 
 ---
 
-## Получение токена (для админ-эндпоинтов)
+## Токен можно получить двумя способами: через регистрацию нового пользователя или вход существующего.
 
-1. Зарегистрируйтесь через API:
+1. Регистрация нового пользователя через API:
 
 ```bash
 Invoke-RestMethod -Uri http://localhost:8000/api/auth/register `
@@ -44,21 +44,21 @@ Invoke-RestMethod -Uri http://localhost:8000/api/auth/register `
 
 ```
 
-2. Войдите и получите токен:
+2. Вход существующего пользователя:
 
 ```bash
-curl -X POST http://localhost:8000/api/auth/login \
--H "Content-Type: application/json" \
--d '{"email":"admin@test.com","password":"password"}'
+Invoke-RestMethod -Uri http://localhost:8000/api/auth/login `
+-Method POST `
+-Headers @{
+    "Accept" = "application/json"
+    "Content-Type" = "application/json"
+} `
+-Body (@{
+    email = "ivan1@test.com"
+    password = "password"
+} | ConvertTo-Json)
+
 ```
-
-- В ответе будет поле `token`. Этот токен используется для всех админ-эндпоинтов:
-
-```http
-Authorization: Bearer <ваш_токен>
-```
-
----
 
 ## Краткий список эндпоинтов
 
