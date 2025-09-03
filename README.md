@@ -87,16 +87,29 @@ Invoke-RestMethod -Uri http://localhost:8000/api/auth/login `
 1. Создать заявку (публичный):
 
 ```bash
-curl -X POST http://localhost:8000/api/leads \
--H "Content-Type: application/json" \
--d '{"name":"Иван","email":"ivan@test.com","message":"Тест"}'
+ Invoke-RestMethod -Uri http://localhost:8000/api/leads `
+-Method POST `
+-Headers @{
+    "Accept" = "application/json"
+    "Content-Type" = "application/json"
+} `
+-Body (@{
+    name = "Иван"
+    email = "ivan@test.com"
+    message = "Тестовое сообщение"
+} | ConvertTo-Json)
+
 ```
 
 2. Получить список заявок (админ):
 
 ```bash
-curl -X GET http://localhost:8000/api/leads \
--H "Authorization: Bearer <ваш_токен>"
+Invoke-RestMethod -Uri http://localhost:8000/api/leads `
+-Method GET `
+-Headers @{
+    "Accept" = "application/json"
+    "Authorization" = "Bearer Ваш_токен_без_кавычек"
+}
 ```
 
 3. Создать комментарий к заявке:
@@ -112,14 +125,10 @@ curl -X POST http://localhost:8000/api/leads/1/comments \
 
 ## Сброс и повторный запуск
 
-Если нужно полностью очистить базу и запустить заново:
+Если нужно очистить таблицы:
 
 ```bash
-docker-compose down -v
-docker-compose up -d
-docker exec -it sistema-app php artisan migrate --seed
+docker exec -it sistema-app php artisan migrate:fresh
 ```
 
-# Готово!
-Теперь проверяющий может сразу поднять проект, зайти в базу, получить токен и протестировать все эндпоинты.
 
