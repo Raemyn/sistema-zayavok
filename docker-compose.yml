@@ -6,45 +6,45 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: sistema-app
-    restart: always
+    restart: unless-stopped
     working_dir: /var/www
     volumes:
-      - .:/var/www
+      - .:/var/www:cached
+      - composer_cache:/root/.composer/cache
     ports:
       - "8000:8000"
+    environment:
+      # Эти переменные будут использованы Laravel'ом из .env (на всякий случай продублированы)
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: sistema_zayavok
+      DB_USERNAME: laravel
+      DB_PASSWORD: laravel
     depends_on:
       db:
         condition: service_healthy
-    command: sh -c "php artisan serve --host=0.0.0.0 --port=8000"
+    command: >
+      sh -c "
+        if [ ! -f .env ]; then cp .env.example .env || true; fi &&
+        composer install --no-interaction --prefer-dist &&
+        php -r \"is_dir('storage') || mkdir('storage', 0777, true);\" &&
+        php -r \"is_dir('bootstrap/cache') || mkdir('bootstrap/cache', 0777, true);\" &&
+        php artisan key:generate --force &&
+        php artisan storage:link || true &&
+        php artisan migrate --force &&
+        php artisan serve --host=0.0.0.0 --port=8000
+      "
 
   db:
     image: mysql:8.0
     container_name: sistema-db
-    restart: always
+    restart: unless-stopped
     environment:
       MYSQL_DATABASE: sistema_zayavok
       MYSQL_ROOT_PASSWORD: root
       MYSQL_USER: laravel
       MYSQL_PASSWORD: laravel
+    # ⚠️ Если у тебя уже запущен локальный MySQL на 3306 — поменяй слева на 3307
     ports:
       - "3306:3306"
     volumes:
-      - db_data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 5s
-      retries: 5
-      start_period: 10s
-
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    container_name: sistema-phpmyadmin
-    restart: always
-    environment:
-      PMA_HOST: db
-      PMA_PORT: 3306
-    ports:
-      - "8080:80"
-
-volumes:
-  db_data:
