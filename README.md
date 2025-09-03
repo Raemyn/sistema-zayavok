@@ -29,9 +29,19 @@ docker exec -it sistema-app php artisan migrate --seed
 1. Зарегистрируйтесь через API:
 
 ```bash
-curl -X POST http://localhost:8000/api/auth/register \
--H "Content-Type: application/json" \
--d '{"name":"Admin","email":"admin@test.com","password":"password","password_confirmation":"password"}'
+Invoke-RestMethod -Uri http://localhost:8000/api/auth/register `
+-Method POST `
+-Headers @{
+    "Accept" = "application/json"
+    "Content-Type" = "application/json"
+} `
+-Body (@{
+    name = "Иван"
+    email = "ivan1@test.com"
+    password = "password"
+    password_confirmation = "password"
+} | ConvertTo-Json)
+
 ```
 
 2. Войдите и получите токен:
