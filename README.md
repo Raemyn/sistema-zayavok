@@ -23,8 +23,6 @@ docker-compose up --build -d
 - Database: sistema_zayavok
 
 ---
-## Адаптивный интерфейс с Blade и Vue 3.
-
 
 
 
