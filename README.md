@@ -37,7 +37,7 @@ Invoke-RestMethod -Uri http://localhost:8000/api/auth/register `
     "Content-Type" = "application/json"
 } `
 -Body (@{
-    name = "Иван"
+    name = "Ivan"
     email = "ivan1@test.com"
     password = "password"
     password_confirmation = "password"
@@ -95,11 +95,11 @@ Invoke-RestMethod -Uri http://localhost:8000/api/auth/login `
     "Content-Type" = "application/json"
 } `
 -Body (@{
-    name = "Иван"
+    name = "Ivan"
     email = "ivan@test.com"
-    message = "Тестовое сообщение"
+    message = "text message"
 } | ConvertTo-Json)
-
+                                                                                                    
 ```
 
 2. Получить список заявок (админ):
@@ -119,7 +119,7 @@ Invoke-RestMethod -Uri http://localhost:8000/api/leads `
 curl -X POST http://localhost:8000/api/leads/1/comments \
 -H "Authorization: Bearer <ваш_токен>" \
 -H "Content-Type: application/json" \
--d '{"body":"Первый комментарий"}'
+-d '{"body":"first comment"}'
 ```
 
 ---
