@@ -110,7 +110,7 @@ Invoke-RestMethod -Uri http://localhost:8000/api/leads `
 -Headers @{
     "Accept" = "application/json"
     "Authorization" = "Bearer Ваш_токен_без_кавычек"
-}
+} | ConvertTo-Json
 ```
 
 3. Создать комментарий к заявке (админ):
