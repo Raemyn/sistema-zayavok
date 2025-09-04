@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Список заявок</title>
+<title>Список заявок с комментариями</title>
 <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 <style>
 body {
@@ -12,7 +12,7 @@ body {
 }
 
 #admin {
-    max-width: 700px;
+    max-width: 800px;
     margin: auto;
     background: white;
     padding: 30px;
@@ -48,18 +48,35 @@ ul {
 li {
     background-color: #f9f9f9;
     padding: 15px;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
     border-radius: 8px;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
     box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+li > div:first-child {
+    margin-bottom: 10px;
 }
 
 li select {
     padding: 5px;
     border-radius: 5px;
     border: 1px solid #ccc;
+}
+
+.comment-list {
+    margin-top: 10px;
+    padding-left: 20px;
+    border-left: 2px solid #ddd;
+}
+
+.comment-list li {
+    background-color: #eef0f3;
+    margin-bottom: 5px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 0.9em;
 }
 
 p.error {
@@ -71,7 +88,7 @@ p.error {
 </head>
 <body>
 <div id="admin">
-    <h2>Список заявок</h2>
+    <h2>Список заявок с комментариями</h2>
     <button @click="loadLeads">Загрузить заявки</button>
 
     <ul v-if="leads.length">
@@ -82,6 +99,7 @@ p.error {
                 <em>@{{ lead.message }}</em>
             </div>
             <div>
+                <label>Статус:</label>
                 <select v-model="lead.status" @change="updateStatus(lead)">
                     <option value="new">Новая</option>
                     <option value="in_progress">В работе</option>
@@ -89,6 +107,13 @@ p.error {
                     <option value="rejected">Отклонена</option>
                 </select>
             </div>
+
+            <!-- Список комментариев -->
+           <ul v-if="lead.comments && lead.comments.length" class="comment-list">
+    <li v-for="comment in lead.comments" :key="comment.id">
+        <strong>Пользователь:</strong> @{{ comment.body }}
+    </li>
+</ul>
         </li>
     </ul>
 
@@ -105,60 +130,72 @@ const app = Vue.createApp({
         }
     },
     methods: {
-        loadLeads() {
+        async loadLeads() {
             const token = localStorage.getItem('api_token');
             if (!token) {
                 this.error = 'Не авторизован';
                 return;
             }
 
-            fetch('/api/leads', {
-                headers: {
-                    'Authorization': 'Bearer ' + token,
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(res => res.json())
-            .then(data => {
+            try {
+                const res = await fetch('/api/leads', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const data = await res.json();
+
                 if (data && data.data) {
-                    this.leads = data.data;
+                    // Загружаем комментарии для каждой заявки
+                    const leadsWithComments = await Promise.all(
+                        data.data.map(async lead => {
+                            try {
+                                const commentsRes = await fetch(`/api/leads/${lead.id}/comments`, {
+                                    headers: { 'Authorization': 'Bearer ' + token }
+                                });
+                                const commentsData = await commentsRes.json();
+                                lead.comments = commentsData || [];
+                            } catch {
+                                lead.comments = [];
+                            }
+                            return lead;
+                        })
+                    );
+                    this.leads = leadsWithComments;
                     this.error = '';
                 } else {
                     this.leads = [];
                     this.error = 'Заявок не найдено';
                 }
-            })
-            .catch(() => {
+            } catch {
                 this.error = 'Не удалось загрузить заявки';
-            });
+            }
         },
-        updateStatus(lead) {
+        async updateStatus(lead) {
             const token = localStorage.getItem('api_token');
             if (!token) {
                 this.error = 'Не авторизован';
                 return;
             }
 
-            fetch(`/api/leads/${lead.id}`, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': 'Bearer ' + token,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ status: lead.status })
-            })
-            .then(res => res.json())
-       .then(data => {
-    // допустим, если data.id существует — значит успешно
-    if (!data.id) {
-        this.error = 'Не удалось обновить статус';
-    } else {
-        this.error = '';
-    }
-})
-            .catch(() => {
+            try {
+                const res = await fetch(`/api/leads/${lead.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ status: lead.status })
+                });
+                const data = await res.json();
+
+                // Если API вернул id — считаем успешным
+                if (!data.id) {
+                    this.error = 'Не удалось обновить статус';
+                } else {
+                    this.error = '';
+                }
+            } catch {
                 this.error = 'Ошибка при обновлении статуса';
-            });
+            }
         }
     }
 });
