@@ -116,10 +116,15 @@ Invoke-RestMethod -Uri http://localhost:8000/api/leads `
 3. Создать комментарий к заявке (админ):
 
 ```bash
-curl -X POST http://localhost:8000/api/leads/1/comments \
--H "Authorization: Bearer <ваш_токен>" \
--H "Content-Type: application/json" \
--d '{"body":"first comment"}'
+Invoke-RestMethod -Uri http://localhost:8000/api/leads/1/comments `
+-Method POST `
+-Headers @{
+    "Accept" = "application/json"
+    "Authorization" = "Bearer Ваш_токен_без_кавычек"
+} `
+-Body '{
+    "body": "first comment"
+}'
 ```
 
 ---
