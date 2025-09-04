@@ -113,18 +113,19 @@ Invoke-RestMethod -Uri http://localhost:8000/api/leads `
 } | ConvertTo-Json
 ```
 
-3. Создать комментарий к заявке (админ):
+3. Создать источник (админ):
 
 ```bash
-Invoke-RestMethod -Uri http://localhost:8000/api/leads/1/comments `
+Invoke-RestMethod -Uri http://localhost:8000/api/sources `
 -Method POST `
 -Headers @{
-    "Accept" = "application/json"
-    "Authorization" = "Bearer Ваш_токен_без_кавычек"
+    "Authorization" = "Bearer aK0ineMSKv8SGtQ7Sa1HKPheIzdxaMzVW2LJNYF96afeddb3"
+    "Accept"        = "application/json"
+    "Content-Type"  = "application/json"
 } `
--Body '{
-    "body": "first comment"
-}'
+-Body (@{
+    name = "Instagram"
+} | ConvertTo-Json -Depth 3)
 ```
 
 ---
