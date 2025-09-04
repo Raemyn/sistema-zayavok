@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Http\Requests\LeadStoreRequest;
@@ -9,6 +8,18 @@ use Illuminate\Validation\Rule;
 
 class LeadController extends Controller
 {
+    // Публичная форма для отправки заявки
+    public function create()
+    {
+        return view('lead_form'); // resources/views/lead_form.blade.php
+    }
+
+// Мини-админка (список заявок, смена статуса)
+    public function admin()
+    {
+        return view('admin.index'); // resources/views/admin/index.blade.php
+    }
+
     // Создать заявку (POST /api/leads)
     public function store(LeadStoreRequest $request)
     {

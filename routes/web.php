@@ -3,13 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LeadController;
 
-// Главная страница
-Route::get('/', function () {
-    return view('welcome');
-});
+// Публичная форма
+Route::get('/lead/create', [LeadController::class, 'create']);
 
-// Публичная форма заявки
-Route::get('/lead-form', [LeadController::class, 'create'])->name('lead.create');
-
-// Мини-админка (требует токен)
-Route::get('/admin', [LeadController::class, 'admin'])->name('admin.index');
+// Мини-админка (только для авторизованных)
+Route::middleware('auth:sanctum')->get('/admin/leads', [LeadController::class, 'admin']);
