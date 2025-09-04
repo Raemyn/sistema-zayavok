@@ -170,7 +170,7 @@ Invoke-RestMethod -Uri http://localhost:8000/api/sources `
 ```text
 {{server}} = http://localhost:8000/api
 
-
+```
 ## Сброс и повторный запуск
 
 Если нужно очистить таблицы:
