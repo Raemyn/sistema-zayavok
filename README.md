@@ -9,8 +9,7 @@
 git clone https://github.com/Raemyn/sistema-zayavok
 cd sistema-zayavok
 docker-compose up --build -d
-docker exec -it sistema-app php artisan migrate:fresh
-# Проект будет доступен на http://localhost:8000
+# Проект будет доступен на http://localhost:8000/api/
 ```
 
 ---
