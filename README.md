@@ -158,6 +158,19 @@ Invoke-RestMethod -Uri http://localhost:8000/api/sources `
 
 ---
 
+## Postman коллекция для быстрого тестирования
+
+**Файл:** `Sistema Zayavok API.postman_collection.json`
+
+### Как использовать
+
+1. Импортируйте файл коллекции в Postman.
+2. Установите переменную:
+
+```text
+{{server}} = http://localhost:8000/api
+
+
 ## Сброс и повторный запуск
 
 Если нужно очистить таблицы:
