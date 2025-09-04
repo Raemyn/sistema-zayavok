@@ -4,7 +4,7 @@
 
 
 Склонируйте репозиторий и запустите проект:
-
+команды в powershell
 ```bash
 git clone https://github.com/Raemyn/sistema-zayavok
 cd sistema-zayavok
