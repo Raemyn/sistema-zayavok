@@ -46,7 +46,7 @@
 </head>
 <body>
 <div id="app">
-    <h2>Вход в админку2</h2>
+    <h2>Вход в админку</h2>
     <form @submit.prevent="login">
         <label>Email:</label>
         <input v-model="email" type="email" placeholder="Email" required>
