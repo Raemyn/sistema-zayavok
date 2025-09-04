@@ -2,14 +2,13 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Мини-админка</title>
+    <title>Админка</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 </head>
 <body>
 <div id="admin">
     <h2>Список заявок</h2>
     <button @click="loadLeads">Загрузить заявки</button>
-
     <ul>
         <li v-for="lead in leads" :key="lead.id">
             {{ lead.name }} — {{ lead.status }}
@@ -27,18 +26,31 @@
 const app = Vue.createApp({
     data() {
         return {
-            leads: []
+            leads: [],
+            token: localStorage.getItem('api_token')
         }
     },
     methods: {
         loadLeads() {
+            if (!this.token) {
+                alert('Сначала войдите в админку');
+                window.location.href = '/admin/login';
+                return;
+            }
             fetch('/api/leads', {
                 headers: {
                     'Accept': 'application/json',
-                    'Authorization': 'Bearer ' + localStorage.getItem('token') // Токен сохраняй после логина
+                    'Authorization': 'Bearer ' + this.token
                 }
             })
-            .then(res => res.json())
+            .then(res => {
+                if (res.status === 401) {
+                    alert('Токен невалидный, войдите снова');
+                    window.location.href = '/admin/login';
+                    return [];
+                }
+                return res.json();
+            })
             .then(data => {
                 this.leads = data.data ?? [];
             });
@@ -48,15 +60,17 @@ const app = Vue.createApp({
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    'Authorization': 'Bearer ' + this.token
                 },
                 body: JSON.stringify({ status: lead.status })
             })
             .then(res => res.json())
-            .then(() => {
-                alert('Статус обновлен!');
-            });
+            .then(() => alert('Статус обновлён!'))
+            .catch(() => alert('Ошибка при обновлении'));
         }
+    },
+    mounted() {
+        this.loadLeads(); // загружаем заявки сразу при открытии
     }
 })
 app.mount('#admin')
