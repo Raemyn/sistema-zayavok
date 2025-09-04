@@ -119,7 +119,7 @@ Invoke-RestMethod -Uri http://localhost:8000/api/leads `
 Invoke-RestMethod -Uri http://localhost:8000/api/sources `
 -Method POST `
 -Headers @{
-    "Authorization" = "Bearer aK0ineMSKv8SGtQ7Sa1HKPheIzdxaMzVW2LJNYF96afeddb3"
+    "Authorization" = "Bearer Ваш_токен_без_кавычек"
     "Accept"        = "application/json"
     "Content-Type"  = "application/json"
 } `
